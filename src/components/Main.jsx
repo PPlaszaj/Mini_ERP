@@ -8,6 +8,7 @@ import {
 import supabase from "../services/supabase";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import Orders from "./Orders";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -41,7 +42,7 @@ const Main = () => {
     token: { colorBgContainer },
   } = theme.useToken();
   return (
-    <Layout>
+    <Layout className="layout" style={{ height: "100vh" }}>
       <Sider
         breakpoint="lg"
         collapsedWidth="0"
@@ -60,6 +61,11 @@ const Main = () => {
           items={[
             { label: "Home", key: "home", icon: <HomeFilled /> },
             { label: "Orders", key: "orders", icon: <ShoppingCartOutlined /> },
+            {
+              label: "products",
+              key: "products",
+              icon: <ShoppingCartOutlined />,
+            },
             {
               label: "Signout",
               key: "signout",
@@ -89,7 +95,7 @@ const Main = () => {
               background: colorBgContainer,
             }}
           >
-            content
+            <Orders />
           </div>
         </Content>
         <Footer
