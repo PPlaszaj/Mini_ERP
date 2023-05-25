@@ -1,86 +1,96 @@
-import { Form, Space, Table, Tag, Button, Modal, Input } from "antd";
-
-import { useState } from "react";
-import "../styles/Orders.css";
+import { useEffect, useState } from "react";
+import { Space, Table, Button, Popconfirm, message } from "antd";
 import OrdersModal from "./OrdersModal";
-
-const columns = [
-  {
-    title: "Order Number",
-    dataIndex: "name",
-    key: "name",
-    render: (text) => <a>{text}</a>,
-  },
-  {
-    title: "Order Name",
-    dataIndex: "age",
-    key: "age",
-  },
-  {
-    title: "Creatind Data",
-    dataIndex: "address",
-    key: "address",
-  },
-  {
-    title: "DeadLine",
-    key: "tags",
-    dataIndex: "tags",
-    render: (_, { tags }) => (
-      <>
-        {tags.map((tag) => {
-          let color = tag.length > 5 ? "geekblue" : "green";
-          if (tag === "loser") {
-            color = "volcano";
-          }
-          return (
-            <Tag color={color} key={tag}>
-              {tag.toUpperCase()}
-            </Tag>
-          );
-        })}
-      </>
-    ),
-  },
-  {
-    title: "Action",
-    key: "action",
-    render: (_, record) => (
-      <Space size="middle">
-        <a>Edit </a>
-        <a>Delete</a>
-      </Space>
-    ),
-  },
-];
-const data = [
-  {
-    key: "1",
-    name: "John Brown",
-    age: 32,
-    address: "New York No. 1 Lake Park",
-    tags: ["nice", "developer"],
-  },
-  {
-    key: "2",
-    name: "Jim Green",
-    age: 42,
-    address: "London No. 1 Lake Park",
-    tags: ["loser"],
-  },
-  {
-    key: "3",
-    name: "Joe Black",
-    age: 32,
-    address: "Sydney No. 1 Lake Park",
-    tags: ["cool", "teacher"],
-  },
-];
+import supabase from "../services/supabase";
 
 const Orders = () => {
+  const [data, setData] = useState([]);
+  const [key, setKey] = useState(0);
+  useEffect(() => {
+    fetchOrders();
+  }, []);
+
+  const fetchOrders = async () => {
+    try {
+      const { data, error } = await supabase.from("Orders").select("*");
+      if (!error) {
+        setData(data);
+      } else {
+        console.log(error);
+      }
+      setKey((key) => key + 1);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDelete = async (record) => {
+    try {
+      const { error } = await supabase
+        .from("Orders")
+        .delete()
+        .eq("id", record.id);
+      if (!error) {
+        message.success("Order deleted successfully");
+        fetchOrders(); // Odświeżenie danych po usunięciu wpisu
+      } else {
+        console.log(error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const columns = [
+    {
+      title: "Order Number",
+      dataIndex: "order_number",
+      key: "orderNumber",
+    },
+    {
+      title: "Order Name",
+      dataIndex: "order_name",
+      key: "orderName",
+    },
+    {
+      title: "Creating Date",
+      dataIndex: "creating_date",
+      key: "creatingDate",
+    },
+    {
+      title: "Deadline",
+      key: "deadline",
+      dataIndex: "deadline",
+    },
+    {
+      title: "Action",
+      key: "action",
+      render: (_, record) => (
+        <Space size="middle">
+          <Popconfirm
+            title="Are you sure you want to delete this order?"
+            onConfirm={() => handleDelete(record)}
+            okText="Yes"
+            cancelText="No"
+            placement="leftTop"
+          >
+            <a>Delete</a>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ];
+
   return (
     <>
       <OrdersModal />
-      <Table columns={columns} dataSource={data} />;
+      <Table
+        pagination={false}
+        style={{ margin: "20px" }}
+        columns={columns}
+        dataSource={data.map((item) => ({ ...item, key: item.id }))}
+        key={key}
+      />
     </>
   );
 };

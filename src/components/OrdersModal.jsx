@@ -1,7 +1,16 @@
 import { Button, Form, Input, Modal, DatePicker } from "antd";
 import { useState } from "react";
+import supabase from "../services/supabase";
+import Orders from "./Orders";
+
 const CollectionCreateForm = ({ open, onCreate, onCancel }) => {
   const [form] = Form.useForm();
+  const [deadline, setDeadline] = useState(""); // Stan przechowujący wartość deadline jako string
+
+  const handleDatePickerChange = (date, dateString) => {
+    setDeadline(dateString); // Aktualizacja stanu z wartością jako string
+  };
+
   return (
     <Modal
       open={open}
@@ -14,42 +23,73 @@ const CollectionCreateForm = ({ open, onCreate, onCancel }) => {
           .validateFields()
           .then((values) => {
             form.resetFields();
-            onCreate(values);
+            onCreate({ ...values, deadline });
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
-          });
+          })
+          .fetchOrders();
       }}
     >
       <Form form={form} layout="vertical" name="form_in_modal">
         <Form.Item
-          name="title"
+          name="orderNumber"
           label="Order Number"
           rules={[
             {
               required: true,
-              message: "Please input the title of collection!",
+              message: "Please input the order number!",
             },
           ]}
         >
           <Input />
         </Form.Item>
-        <Form.Item name="description" label="Order Name">
+        <Form.Item
+          rules={[
+            {
+              required: true,
+              message: "Please input the order Name!",
+            },
+          ]}
+          name="orderName"
+          label="Order Name"
+        >
           <Input type="textarea" />
         </Form.Item>
-        <Form.Item name="deadLine" label="DeadLine">
-          <DatePicker />
+        <Form.Item
+          rules={[
+            {
+              required: true,
+              message: "Please input the data!",
+            },
+          ]}
+          name="deadline"
+          label="Deadline"
+        >
+          <DatePicker format={"YYYY-MM-DD"} onChange={handleDatePickerChange} />
         </Form.Item>
       </Form>
     </Modal>
   );
 };
+
 const OrdersModal = () => {
   const [open, setOpen] = useState(false);
-  const onCreate = (values) => {
-    console.log("Received values of form: ", values);
+  const onCreate = async (values) => {
     setOpen(false);
+
+    const { data, error } = await supabase.from("Orders").insert([
+      {
+        order_number: values.orderNumber,
+        order_name: values.orderName,
+        deadline: values.deadline,
+      },
+    ]);
+    if (!error) {
+      console.log(data);
+    }
   };
+
   return (
     <div>
       <Button
@@ -70,4 +110,5 @@ const OrdersModal = () => {
     </div>
   );
 };
+
 export default OrdersModal;

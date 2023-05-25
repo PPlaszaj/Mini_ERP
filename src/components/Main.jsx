@@ -1,5 +1,5 @@
 import { Layout, Menu, theme } from "antd";
-import React from "react";
+
 import {
   HomeFilled,
   LogoutOutlined,
@@ -43,16 +43,7 @@ const Main = () => {
   } = theme.useToken();
   return (
     <Layout className="layout" style={{ height: "100vh" }}>
-      <Sider
-        breakpoint="lg"
-        collapsedWidth="0"
-        onBreakpoint={(broken) => {
-          console.log(broken);
-        }}
-        onCollapse={(collapsed, type) => {
-          console.log(collapsed, type);
-        }}
-      >
+      <Sider breakpoint="lg" collapsedWidth="0">
         <div className="demo-logo-vertical" />
         <Menu
           theme="dark"
