@@ -1,7 +1,6 @@
 import { Button, Form, Input, Modal, DatePicker } from "antd";
 import { useState } from "react";
 import supabase from "../services/supabase";
-import Orders from "./Orders";
 
 const CollectionCreateForm = ({ open, onCreate, onCancel }) => {
   const [form] = Form.useForm();
@@ -27,8 +26,7 @@ const CollectionCreateForm = ({ open, onCreate, onCancel }) => {
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
-          })
-          .fetchOrders();
+          });
       }}
     >
       <Form form={form} layout="vertical" name="form_in_modal">
@@ -73,7 +71,7 @@ const CollectionCreateForm = ({ open, onCreate, onCancel }) => {
   );
 };
 
-const OrdersModal = () => {
+const OrdersModal = ({ onOrderCreated }) => {
   const [open, setOpen] = useState(false);
   const onCreate = async (values) => {
     setOpen(false);
@@ -86,7 +84,7 @@ const OrdersModal = () => {
       },
     ]);
     if (!error) {
-      console.log(data);
+      onOrderCreated();
     }
   };
 

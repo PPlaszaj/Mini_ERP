@@ -1,14 +1,9 @@
 import { Layout, Menu, theme } from "antd";
 
-import {
-  HomeFilled,
-  LogoutOutlined,
-  ShoppingCartOutlined,
-} from "@ant-design/icons";
 import supabase from "../services/supabase";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import Orders from "./Orders";
+import SideBars from "./SideBar";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -30,43 +25,13 @@ const Main = () => {
       navigation("/signin");
     }
   };
-  const handleLogout = async () => {
-    let { error } = await supabase.auth.signOut();
-
-    if (!error) {
-      navigation("/signin");
-    }
-  };
 
   const {
     token: { colorBgContainer },
   } = theme.useToken();
   return (
     <Layout className="layout" style={{ height: "100vh" }}>
-      <Sider breakpoint="lg" collapsedWidth="0">
-        <div className="demo-logo-vertical" />
-        <Menu
-          theme="dark"
-          mode="inline"
-          defaultSelectedKeys={["4"]}
-          items={[
-            { label: "Home", key: "home", icon: <HomeFilled /> },
-            { label: "Orders", key: "orders", icon: <ShoppingCartOutlined /> },
-            {
-              label: "products",
-              key: "products",
-              icon: <ShoppingCartOutlined />,
-            },
-            {
-              label: "Signout",
-              key: "signout",
-              danger: true,
-              icon: <LogoutOutlined />,
-              onClick: handleLogout,
-            },
-          ]}
-        />
-      </Sider>
+      <SideBars />
       <Layout>
         <Header
           style={{
@@ -85,9 +50,7 @@ const Main = () => {
               minHeight: 360,
               background: colorBgContainer,
             }}
-          >
-            <Orders />
-          </div>
+          ></div>
         </Content>
         <Footer
           style={{
