@@ -18,7 +18,7 @@
 
 ![Orders](https://i.postimg.cc/wjtPkQP3/821shots-so.png)
 
-![Modal](https://i.postimg.cc/bJXRkKSN/39shots-so.png)
+![Modal](https://i.postimg.cc/GtT8KpWW/282shots-so.png)
 
 ## Installation
 
