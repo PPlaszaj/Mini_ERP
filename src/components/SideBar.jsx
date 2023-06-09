@@ -22,7 +22,7 @@ const SideBar = () => {
   };
 
   return (
-    <Sider breakpoint="lg" collapsedWidth="0">
+    <Sider breakpoint="lg" collapsedWidth="0" style={{ minHeight: "100vh" }}>
       <div className="demo-logo-vertical" />
       <Menu
         theme="dark"
@@ -31,7 +31,7 @@ const SideBar = () => {
         selectedKeys={[location.pathname]}
         items={[
           {
-            label: "Home",
+            label: "Dashboard",
             key: "/",
             icon: <HomeFilled />,
             onClick: () => navigation("/"),

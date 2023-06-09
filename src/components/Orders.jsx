@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Space, Table, Popconfirm, message, Layout, theme } from "antd";
+import { Space, Table, Popconfirm, message, Layout, Tag, theme } from "antd";
 import OrdersModal from "./OrdersModal";
 import supabase from "../services/supabase";
 import SideBar from "./SideBar";
@@ -16,16 +16,18 @@ const Orders = () => {
   let alreadyMounted = false;
   const [data, setData] = useState([]);
   const [key, setKey] = useState(0);
+
   useEffect(() => {
     fetchOrders();
   }, [refreshTable]);
+
   useEffect(() => {
     if (!alreadyMounted) {
       getSession();
     }
     alreadyMounted = true;
   }, []);
-  //sp0rawdzenie czy zalogowany
+
   const getSession = async () => {
     const { data, error } = await supabase.auth.getSession();
 
@@ -52,6 +54,47 @@ const Orders = () => {
     }
   };
 
+  const fetchOrderProducts = async (orderNumber) => {
+    try {
+      const { data, error } = await supabase
+        .from("Products")
+        .select("status")
+        .eq("order_number", orderNumber);
+
+      if (!error) {
+        const allProductsReady = data.every(
+          (product) => product.status === true
+        );
+
+        if (allProductsReady) {
+          updateOrderStatus(orderNumber, "Ready");
+        } else {
+          updateOrderStatus(orderNumber, "In progress");
+        }
+      } else {
+        console.log(error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const updateOrderStatus = async (orderNumber, status) => {
+    try {
+      const { data, error } = await supabase
+        .from("Orders")
+        .update({ status })
+        .eq("order_number", orderNumber);
+
+      if (!error) {
+      } else {
+        console.log(error);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleDelete = async (record) => {
     try {
       const { error } = await supabase
@@ -68,6 +111,7 @@ const Orders = () => {
       console.log(error);
     }
   };
+
   const formatDate = (dateString) => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
@@ -95,7 +139,32 @@ const Orders = () => {
       key: "deadline",
       dataIndex: "deadline",
       render: (text) => formatDate(text),
-      onClick: () => navigation(`/orders/${record.id}`),
+    },
+    {
+      title: "Status",
+      dataIndex: "order_number",
+      key: "status",
+      render: (orderNumber) => {
+        const order = data.find((item) => item.order_number === orderNumber);
+        let color = "";
+        let tagText = "N/A";
+
+        if (order) {
+          if (order.status === "Ready") {
+            color = "green";
+            tagText = "Finished";
+          } else if (order.status === "In progress") {
+            color = "red";
+            tagText = "In Progress";
+          }
+        }
+
+        return (
+          <Tag color={color} key={orderNumber}>
+            {tagText}
+          </Tag>
+        );
+      },
     },
     {
       title: "Action",
@@ -116,6 +185,17 @@ const Orders = () => {
     },
   ];
 
+  useEffect(() => {
+    const fetchProductsData = async () => {
+      const orderNumbers = data.map((item) => item.order_number);
+      for (const orderNumber of orderNumbers) {
+        await fetchOrderProducts(orderNumber);
+      }
+    };
+
+    fetchProductsData();
+  }, [data]);
+
   return (
     <Layout className="layout" style={{ height: "100%", minHeight: "100vh" }}>
       <SideBar />
@@ -124,8 +204,12 @@ const Orders = () => {
           style={{
             padding: 0,
             background: colorBgContainer,
+            textAlign: "center",
           }}
-        />
+        >
+          <h2>Orders</h2>
+        </Header>
+
         <Content
           style={{
             margin: "24px 16px 0",
@@ -151,7 +235,6 @@ const Orders = () => {
                     const targetElement = event.target;
                     const columnIndex = targetElement.cellIndex;
 
-                    // Sprawdź, czy kliknięcie wystąpiło w pierwszych czterech kolumnach żeby dało się kliknąc dewlete
                     if (columnIndex < 4) {
                       navigation(`/orders/${record.id}`);
                     }

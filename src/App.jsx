@@ -5,6 +5,7 @@ import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
 import Orders from "./components/Orders";
 import OrderTab from "./components/OrderTab";
+import Products from "./components/Products";
 import "./App.css";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/orders" element={<Orders />} />
         <Route path="/orders/:id" element={<OrderTab />} />
+        <Route path="/products" element={<Products />} />
       </Routes>
     </Router>
   );

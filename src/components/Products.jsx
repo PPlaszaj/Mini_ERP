@@ -1,20 +1,16 @@
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { Layout, theme } from "antd";
 import supabase from "../services/supabase";
 import SideBar from "./SideBar";
-
-import OrderTabTable from "./OrderTabTable";
+import ProductTable from "./ProductsTable";
 
 const { Header, Content, Footer } = Layout;
 
-const Orders = () => {
-  const { id } = useParams();
-
+const Products = () => {
+  // spraqwdzenie czy użytkowanik jest zalogowany
   const navigation = useNavigate();
   let alreadyMounted = false;
-
-  // Sprawdzenie, czy użytkownik jest zalogowany
   useEffect(() => {
     if (!alreadyMounted) {
       getSession();
@@ -34,29 +30,6 @@ const Orders = () => {
     token: { colorBgContainer },
   } = theme.useToken();
 
-  // Pobieranie danych z Supabase dotyczących zamówienia
-
-  const [data, setData] = useState([]);
-  useEffect(() => {
-    getOrder();
-  }, []);
-  const getOrder = async () => {
-    try {
-      const { data, error } = await supabase
-        .from("Orders")
-        .select()
-        .eq("id", id);
-      if (!error) {
-        setData(data);
-      } else {
-        console.log(error);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  //dodawanie części
-
   return (
     <Layout className="layout">
       <SideBar />
@@ -68,10 +41,7 @@ const Orders = () => {
             textAlign: "center",
           }}
         >
-          <h2>
-            Order number: {data.length > 0 ? data[0].order_number : ""}, Order
-            name: {data.length > 0 ? data[0].order_name : "Loading..."}
-          </h2>
+          <h2>All products</h2>
         </Header>
         <Content
           style={{
@@ -85,7 +55,7 @@ const Orders = () => {
               background: colorBgContainer,
             }}
           >
-            <OrderTabTable myProp={data} />
+            <ProductTable />
           </div>
         </Content>
         <Footer
@@ -99,5 +69,4 @@ const Orders = () => {
     </Layout>
   );
 };
-
-export default Orders;
+export default Products;

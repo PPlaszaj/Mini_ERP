@@ -24,7 +24,7 @@ const CollectionCreateForm = ({ open, onCreate, onCancel }) => {
           .validateFields()
           .then((values) => {
             form.resetFields();
-            onCreate({ ...values, deliveryDate });
+            onCreate({ ...values });
           })
           .catch((info) => {
             console.log("Validate Failed:", info);
@@ -78,7 +78,7 @@ const CollectionCreateForm = ({ open, onCreate, onCancel }) => {
     </Modal>
   );
 };
-const ProductModal = () => {
+const ProductModal = ({ setRefreshTable }) => {
   const { id } = useParams();
   const [open, setOpen] = useState(false);
   const [data, setData] = useState([]);
@@ -120,6 +120,7 @@ const ProductModal = () => {
     ]);
 
     if (!error) {
+      setRefreshTable(true);
     }
   };
 
